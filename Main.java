@@ -1,46 +1,92 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import Controladores.ControladorHorario;
 import Controladores.ControladorPaciente;
 
 public class Main {
     public static void main(String[] args) {
-        /*
-         * String nombreArchivo = "inputs/lab_input.txt";
-         * BufferedReader br = null;
-         * 
-         * try {
-         * br = new BufferedReader(new FileReader(nombreArchivo));
-         * String linea;
-         * 
-         * for (int i = 0; i < 11; i++) {
-         * linea = br.readLine();
-         * if (linea == null) {
-         * // Si la línea 2 no existe, salir del bucle
-         * break;
-         * }
-         * if (i == 10) {// leer linea
-         * String[] valores = linea.split("\\|");
-         * 
-         * System.out.println("Palabra: " + valores[4].trim());
-         * }
-         * }
-         * } catch (IOException e) {
-         * e.printStackTrace();
-         * } finally {
-         * try {
-         * if (br != null) {
-         * br.close();
-         * }
-         * } catch (IOException e) {
-         * e.printStackTrace();
-         * }
-         * }
-         */
+        
+        String nombreArchivo = "inputs/med_input.txt";
+        BufferedReader br = null;
+        boolean encontradaNuevaCita = false;
+        String fechaCita = "";
+        String horaCita = "";
+        String tipoCita = "";
+        String especialidad = "";
+        String nombrePaciente = "";
+        String tipoPaciente = "";
+        String tipoDocumento = "";
+        String identificacion = "";        
+        String telefono = "";
+        String fechaNacimiento = "";
+        String apoderado = "";
+        String nombreApoderado = "";
 
-        ControladorHorario horario = new ControladorHorario();
+        // List<String> registrosAntesDeNuevaCita = new ArrayList<>();
+          
+          try {
+          br = new BufferedReader(new FileReader(nombreArchivo));
+          String linea;
+          
+          while ((linea = br.readLine()) != null) {
+            if (linea.contains("NUEVA CITA")) {
+                encontradaNuevaCita = true;
+                continue;
+            }
+
+            System.out.println(linea);
+    
+            if (encontradaNuevaCita) {
+                String[] valores = linea.split("\\|");
+                fechaCita = valores[0].trim();
+                horaCita = valores[1].trim();
+                tipoCita = valores[2].trim();
+                especialidad = valores[3].trim();
+                nombrePaciente = valores[4].trim();
+                tipoPaciente = valores[5].trim();
+                tipoDocumento = valores[6].trim();
+                identificacion = valores[7].trim();
+                telefono = valores[8].trim();
+                fechaNacimiento =  valores[9].trim();
+                if(valores.length>10){
+                    apoderado = valores[10].trim();
+                    nombreApoderado = valores[11].trim();
+                }
+
+                System.out.println("fecha: "+fechaCita);
+                System.out.println("hora: "+horaCita);
+                System.out.println("tipoCIta: "+tipoCita);
+                System.out.println("espcialidad: "+especialidad);
+                System.out.println("nombrePaciente: "+nombrePaciente);
+                System.out.println("tipoPaciente: "+tipoPaciente);
+                System.out.println("tipoDocumento: "+tipoDocumento);
+                System.out.println("identificacion: "+identificacion);
+                System.out.println("telefono: "+telefono);
+                System.out.println("fechaNacimiento: "+fechaNacimiento);
+                System.out.println("apoderado: "+apoderado);
+                System.out.println("nombreApoderado: "+nombreApoderado);
+
+                break; // Detiene el bucle una vez que se encuentra el nuevo registro
+            }
+        }
+    } catch (IOException e) {
+        e.printStackTrace();
+    } finally {
+        try {
+            if (br != null) {
+                br.close();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+         
+
+       /* ControladorHorario horario = new ControladorHorario();
         String fechaCita = "2024-11-03";
         String horaIngresada = "17:00";
         String tipoCitaIngresada = "General";
@@ -86,6 +132,6 @@ public class Main {
 
         paciente.validaDatosPaciente(tipoIndentificacion, identificacionIngresada, nombreIngresado, fechaNacimiento,
                 telefono);
-
+        */
     }
 }
