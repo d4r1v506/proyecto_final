@@ -2,7 +2,8 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 
-import inputs.Controladores.ControladorHorario;
+import Controladores.ControladorHorario;
+import Controladores.ControladorPaciente;
 
 public class Main {
     public static void main(String[] args) {
@@ -40,32 +41,33 @@ public class Main {
          */
 
         ControladorHorario horario = new ControladorHorario();
-        String fechaIngresada = "2024-11-03";
+        String fechaCita = "2024-11-03";
         String horaIngresada = "17:00";
+        String tipoCitaIngresada = "General";
+        String tipoIndentificacion = "P";
+        String identificacionIngresada = "111";
+        String nombreIngresado = "Darius";
+        String fechaNacimiento = "2023-11-04";
+        String telefono = "0986287516";
 
-        boolean existe = horario.horarioFuncionamiento(fechaIngresada);
+        boolean existe = horario.horarioFuncionamiento(fechaCita);
         // Las consultas médicas tienen los siguientes horarios: Lunes a jueves 8:00 a
         // 19:00 Viernes 8:00 a 13:00
         if (existe) {
-            boolean valida = horario.validarHorario(fechaIngresada, horaIngresada);
+            boolean valida = horario.validarHorario(fechaCita, horaIngresada);
             System.out.println("valida " + valida);
         } else {
             System.out.println("dia fuera de funcionamiento");
         }
         // -------------------------------------
-        boolean validaFeriado = horario.validaFeriado(fechaIngresada);
+        boolean validaFeriado = horario.validaFeriado(fechaCita);
         if (validaFeriado) {
             System.out.println("fecha no disponible es feriado");
         }
         // -------------------------------------
-        try {
-            boolean validaCitaFuturo = horario.fechaFuturo(fechaIngresada);
-            if (validaCitaFuturo) {
-                System.out.println("la Cita es correcta");
-            } else {
-                System.out.println("La cita debe ser antes de 24 horas");
-            }
 
+        try {
+            horario.validaFechaFuturoEspecialista(fechaCita, tipoCitaIngresada);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -73,5 +75,17 @@ public class Main {
         // -------------------------------------
         boolean validaHoraConsecutiva = horario.horarioConsecutivo(horaIngresada);
         System.out.println("valida " + validaHoraConsecutiva);
+
+        ControladorPaciente paciente = new ControladorPaciente();
+        boolean isMayor = paciente.mayorEdad();
+        if (isMayor) {
+            System.out.println("Es mayor de edad");
+        } else {
+            System.out.println("Es menor de edad");
+        }
+
+        paciente.validaDatosPaciente(tipoIndentificacion, identificacionIngresada, nombreIngresado, fechaNacimiento,
+                telefono);
+
     }
 }

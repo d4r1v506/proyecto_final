@@ -1,4 +1,4 @@
-package inputs.Controladores;
+package Controladores;
 
 import java.text.Normalizer;
 import java.text.SimpleDateFormat;
@@ -10,7 +10,7 @@ import java.time.format.TextStyle;
 import java.util.Date;
 import java.util.Locale;
 
-import inputs.util.Constantes;
+import util.Constantes;
 
 public class ControladorHorario {
 
@@ -83,13 +83,23 @@ public class ControladorHorario {
         return Constantes.LISTA_DIAS_FERIADO.contains(fecha);
     }
 
-    // Solo se pueden registrar citas en el futuro.
-    public boolean fechaFuturo(String fecha) throws Exception {
-
+    // Solo se pueden registrar citas en el futuro. solo para especialistas
+    public void validaFechaFuturoEspecialista(String fecha, String tipoCita) throws Exception {
         SimpleDateFormat formato = new SimpleDateFormat("yyyy-MM-dd");
         Date fechaDate = formato.parse(fecha);
         Date fechaActual = new Date();
-        return fechaDate.compareTo(fechaActual) > 0;
+        if (tipoCita.equals("ESPECIALISTA")) {
+            if (fechaDate.compareTo(fechaActual) <= 0) {
+                throw new IllegalArgumentException(
+                        "La cita para especialistas deben ser con al menos 24h de anticipación");
+            }
+        } else {
+            if (fechaDate.compareTo(fechaActual) < 0) {
+                throw new IllegalArgumentException(
+                        "La cita para medicina general deben ser una fecha actual o superior");
+            }
+        }
+
     }
 
     // Los espacios son consecutivos, es decir 08:00, 08:20, etc
