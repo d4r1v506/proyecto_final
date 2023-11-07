@@ -22,7 +22,7 @@ public class ControladorHorario {
         DayOfWeek diaSemana = fechaIngresada.getDayOfWeek();
         // Devolver el nombre del día de la semana en español
         String nombreDiaSemana = diaSemana.getDisplayName(TextStyle.FULL, new Locale("es", "ES"));
-        System.out.println("dia que se ingreso es: " + nombreDiaSemana);
+        // System.out.println("dia que se ingreso es: " + nombreDiaSemana);
 
         String diaSemanSinTitlde = Normalizer.normalize(nombreDiaSemana, Normalizer.Form.NFD)
                 .replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
@@ -84,22 +84,21 @@ public class ControladorHorario {
     }
 
     // Solo se pueden registrar citas en el futuro. solo para especialistas
-    public void validaFechaFuturoEspecialista(String fecha, String tipoCita) throws Exception {
+    public Integer validaFechaFuturoEspecialista(String fecha, String tipoCita) throws Exception {
+        Integer respuesta = 0;
         SimpleDateFormat formato = new SimpleDateFormat("yyyy-MM-dd");
         Date fechaDate = formato.parse(fecha);
         Date fechaActual = new Date();
         if (tipoCita.equals("ESPECIALISTA")) {
             if (fechaDate.compareTo(fechaActual) <= 0) {
-                throw new IllegalArgumentException(
-                        "La cita para especialistas deben ser con al menos 24h de anticipación");
+                respuesta = 1;
             }
         } else {
             if (fechaDate.compareTo(fechaActual) < 0) {
-                throw new IllegalArgumentException(
-                        "La cita para medicina general deben ser una fecha actual o superior");
+                respuesta = 2;
             }
         }
-
+        return respuesta;
     }
 
     // Los espacios son consecutivos, es decir 08:00, 08:20, etc
@@ -113,10 +112,9 @@ public class ControladorHorario {
         LocalTime limiteSuperior = LocalTime.parse("18:40");
 
         if (hora.isAfter(limiteInferior) && hora.isBefore(limiteSuperior) && hora.getMinute() % 20 == 0) {
-            System.out.println("La hora ingresada está dentro del rango de 20 minutos entre las 8:00 y las 19:00.");
+            // System.out.println("La hora ingresada está dentro del rango de 20 minutos
+            // entre las 8:00 y las 19:00.");
             valida = true;
-        } else {
-            System.out.println("La hora ingresada no cumple con los requisitos.");
         }
         return valida;
     }

@@ -1,8 +1,4 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
-package consultamédica;
+package Models;
 
 import java.util.Date;
 
@@ -14,15 +10,19 @@ public class Paciente {
     private String identificacion;
     private String tipoIdentificaion;
     private String nombre;
-    private String apellido;
-    private Date FechaNacimiento;
+    private String fechaNacimiento;
+    private String telefono;
 
-    public Paciente(String identificacion, String tipoIdentificaion, String nombre, String apellido, Date FechaNacimiento) {
+    public Paciente(String identificacion, String tipoIdentificaion, String nombre, String apellido,
+            String fechaNacimiento) {
         this.identificacion = identificacion;
         this.tipoIdentificaion = tipoIdentificaion;
         this.nombre = nombre;
-        this.apellido = apellido;
-        this.FechaNacimiento = FechaNacimiento;
+        this.fechaNacimiento = fechaNacimiento;
+    }
+
+    public Paciente() {
+
     }
 
     public String getIdentificacion() {
@@ -37,14 +37,6 @@ public class Paciente {
         return nombre;
     }
 
-    public String getApellido() {
-        return apellido;
-    }
-
-    public Date getFechaNacimiento() {
-        return FechaNacimiento;
-    }
-
     public void setIdentificacion(String identificacion) {
         this.identificacion = identificacion;
     }
@@ -57,14 +49,20 @@ public class Paciente {
         this.nombre = nombre;
     }
 
-    public void setApellido(String apellido) {
-        this.apellido = apellido;
+    public String getFechaNacimiento() {
+        return fechaNacimiento;
     }
 
-    public void setFechaNacimiento(Date FechaNacimiento) {
-        this.FechaNacimiento = FechaNacimiento;
+    public void setFechaNacimiento(String fechaNacimiento) {
+        this.fechaNacimiento = fechaNacimiento;
     }
 
-    
-    
+    public String getTelefono() {
+        return telefono;
+    }
+
+    public void setTelefono(String telefono) {
+        this.telefono = telefono;
+    }
+
 }

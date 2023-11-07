@@ -6,6 +6,8 @@ import java.time.temporal.ChronoUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import Models.Paciente;
+
 public class ControladorPaciente {
 
     /*
@@ -21,53 +23,54 @@ public class ControladorPaciente {
      * distintos servicios
      */
 
-    public boolean validaDatosPaciente(String tipoIdentificacion, String identificacion, String nombre,
-            String fechaNacmiento, String telefono) {
-        if (tipoIdentificacion.length() != 1) {
-            throw new IllegalArgumentException("El tipo de identificacion solo es un caracter C o P");
+    public String validaDatosPaciente(Paciente paciente) {
+
+        String mensajeError = "";
+        if (paciente.getTipoIdentificaion().length() != 1) {
+            mensajeError = "El tipo de identificacion solo es un caracter C o P";
         }
-        if (!(tipoIdentificacion.equals("C") || tipoIdentificacion.equals("P"))) {
-            throw new IllegalArgumentException("El tipo identificacion solo puede ser C o P");
+        if (!(paciente.getTipoIdentificaion().equals("C") || paciente.getTipoIdentificaion().equals("P"))) {
+            mensajeError = "El tipo identificacion solo puede ser C o P";
         }
 
-        switch (tipoIdentificacion) {
+        switch (paciente.getTipoIdentificaion()) {
             case "C":
-                if (identificacion.length() != 10) {
-                    throw new IllegalArgumentException("La cédula debe tener 10 dígitos");
+                if (paciente.getIdentificacion().length() != 10) {
+                    mensajeError = "La cédula debe tener 10 dígitos";
                 }
-                if (!identificacion.matches("\\d{10}")) {
-                    throw new IllegalArgumentException("La cédula debe contener solo números");
+                if (!paciente.getIdentificacion().matches("\\d{10}")) {
+                    mensajeError = "La cédula debe contener solo números";
                 }
                 break;
             case "P":
-                if (identificacion.length() != 12) {
-                    throw new IllegalArgumentException("El pasaporte debe tener 12 dígitos");
+                if (paciente.getIdentificacion().length() != 12) {
+                    mensajeError = "El pasaporte debe tener 12 dígitos";
                 }
-                if (!identificacion.matches("\\d{12}")) {
-                    throw new IllegalArgumentException("El pasaporte debe contener solo números");
+                if (!paciente.getIdentificacion().matches("\\d{12}")) {
+                    mensajeError = "El pasaporte debe contener solo números";
                 }
                 break;
         }
 
-        if (nombre.isEmpty()) {
-            throw new IllegalArgumentException("El nombre del paciente son campos obligatorios");
+        if (paciente.getNombre().isEmpty()) {
+            mensajeError = "El nombre del paciente son campos obligatorios";
         }
 
         String formatoFecha = "\\d{4}-\\d{2}-\\d{2}";
         Pattern pattern = Pattern.compile(formatoFecha);
-        Matcher matcher = pattern.matcher(fechaNacmiento);
+        Matcher matcher = pattern.matcher(paciente.getFechaNacimiento());
         if (!matcher.matches()) {
-            throw new IllegalArgumentException("el formato de fecha de nacimiento no es valido (yyyy-MM-dd)");
+            mensajeError = "el formato de fecha de nacimiento no es valido (yyyy-MM-dd)";
         }
 
-        if (telefono.length() != 10) {
-            throw new IllegalArgumentException("el telefono debe tener 10 dígitos");
+        if (paciente.getTelefono().length() != 10) {
+            mensajeError = "el telefono debe tener 10 dígitos";
         }
-        if (!telefono.matches("\\d{10}")) {
-            throw new IllegalArgumentException("El telefono debe contener solo números");
+        if (!paciente.getTelefono().matches("\\d{10}")) {
+            mensajeError = "El telefono debe contener solo números";
         }
 
-        return true;
+        return mensajeError;
     }
 
     public boolean mayorEdad() {
