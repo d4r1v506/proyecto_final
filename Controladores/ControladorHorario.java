@@ -88,12 +88,14 @@ public class ControladorHorario {
         Integer respuesta = 0;
         SimpleDateFormat formato = new SimpleDateFormat("yyyy-MM-dd");
         Date fechaDate = formato.parse(fecha);
-        Date fechaActual = new Date();
+        String fechaSistema = formato.format(new Date()); 
+        Date fechaActual = formato.parse(fechaSistema);
+                    
         if (tipoCita.equals("ESPECIALISTA")) {
             if (fechaDate.compareTo(fechaActual) <= 0) {
                 respuesta = 1;
             }
-        } else {
+        } else {           
             if (fechaDate.compareTo(fechaActual) < 0) {
                 respuesta = 2;
             }

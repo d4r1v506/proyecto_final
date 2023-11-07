@@ -155,6 +155,21 @@ public class Main {
             return;
         }
 
+        if(pacienteControlador.requiereApoderado(tipoPaciente, apoderado)){
+            System.out.println("No se pudo agregar: **Se requiere un apoderado**");
+            listadoOriginal(registrosAntesDeNuevaCita);
+            return;
+        }
+
+        if(!pacienteControlador.isMayorEdadApoderado(fechaNacimiento)){
+            System.out.println("No se pudo agregar: **El apoderado debe ser mayor de edad**");
+            listadoOriginal(registrosAntesDeNuevaCita);
+            return;
+        }
+
+        pacienteControlador.existeCitaSimultanea(fechaCita, horaCita, identificacion);
+
+
         // Las consultas médicas tienen los siguientes horarios: Lunes a jueves 8:00
         /*
          * a
