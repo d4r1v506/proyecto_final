@@ -5,12 +5,12 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.time.Month;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
+import util.Constantes;
+import util.UtilDate;
 import Models.Paciente;
 
 public class ControladorPaciente {
@@ -29,14 +29,13 @@ public class ControladorPaciente {
      */
 
     public String validaDatosPaciente(Paciente paciente) {
-
         String mensajeError = "";
-        if (!(paciente.getTipoIdentificaion().equals("C") || paciente.getTipoIdentificaion().equals("P"))) {
+        if (!(paciente.getTipoIdentificaion().equals(Constantes.TIPO_CEDULA) || paciente.getTipoIdentificaion().equals(Constantes.TIPO_PASAPORTE))) {
             mensajeError = "El tipo identificacion solo puede ser C o P";
         }
 
         switch (paciente.getTipoIdentificaion()) {
-            case "C":
+            case Constantes.TIPO_CEDULA:
                 if (paciente.getIdentificacion().length() != 10) {
                     mensajeError = "La cédula debe tener 10 dígitos";
                 } else {
@@ -45,7 +44,7 @@ public class ControladorPaciente {
                     }
                 }
                 break;
-            case "P":
+            case Constantes.TIPO_PASAPORTE:
                 if (paciente.getIdentificacion().length() != 12) {
                     mensajeError = "El pasaporte debe tener 12 dígitos";
                 } else {
@@ -59,11 +58,10 @@ public class ControladorPaciente {
         if (paciente.getNombre().isEmpty()) {
             mensajeError = "El nombre del paciente es campo obligatorio";
         }
-
-        String formatoFecha = "\\d{4}-\\d{2}-\\d{2}";
-        Pattern pattern = Pattern.compile(formatoFecha);
-        Matcher matcher = pattern.matcher(paciente.getFechaNacimiento());
-        if (!matcher.matches()) {
+        
+        Pattern pattern = Pattern.compile(Constantes.FORMATO_FECHA);
+        Matcher igualFormato = pattern.matcher(paciente.getFechaNacimiento());
+        if (!igualFormato.matches()) {
             mensajeError = "el formato de fecha de nacimiento no es valido (yyyy-MM-dd)";
         }
 
@@ -79,39 +77,32 @@ public class ControladorPaciente {
     }
 
     public boolean requiereApoderado(String tipoPaciente, String apoderado) {
-        return tipoPaciente.equals("PMENOR") && apoderado.isEmpty();
+        return tipoPaciente.equals(Constantes.PACIENTE_MENOR) && apoderado.isEmpty();
     }
 
     public boolean isMayorEdadApoderado(String fechaNacimiento) {
-        // LocalDate fNacimiento = LocalDate.of(2015, Month.SEPTEMBER, 18);
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        LocalDate fechaLocalDate = LocalDate.parse(fechaNacimiento, formatter);
-        return ChronoUnit.YEARS.between(fechaLocalDate, LocalDate.now()) >= 18;
+        LocalDate fechaLocalDate = UtilDate.convierteFechaStringtoLocalDate(fechaNacimiento);
+        return ChronoUnit.YEARS.between(fechaLocalDate, UtilDate.obtieneFechaActualLocalDate()) >= Constantes.EDAD_ADULTO;
     }
 
-    public boolean existeCitaSimultanea(String fechaCita, String horaCita, String identificacion) {
-        String nombreArchivo = "inputs/med_input.txt";
+    public boolean existeCitaSimultanea(String fechaCita, String horaCita, String identificacion) {        
         boolean existeCita = false;
         BufferedReader br = null;
         try {
-            br = new BufferedReader(new FileReader(nombreArchivo));
+            br = new BufferedReader(new FileReader(Constantes.NOMBRE_ARCHIVO_INPUT));
             String linea;
             boolean enRango = false;
 
             while ((linea = br.readLine()) != null) {
                 if (linea.contains(fechaCita)) {
                     enRango = true;
-                } else if (enRango && linea.matches("\\d{2}:\\d{2}\\|.*")) {
-                    // String hora = linea.split("\\|")[0];
+                } else if (enRango && linea.matches("\\d{2}:\\d{2}\\|.*")) {                    
                     String[] valores = linea.split("\\|");
 
                     if (identificacion.equals(valores[6])
-                            && (horaAntes(horaCita).equals(valores[0]) || horaDespues(horaCita).equals(valores[0]))) {
-                        // System.out.println("ya tiene una cita previa");
+                            && (UtilDate.restarMinutosHoraCita(horaCita,20).equals(valores[0]) || UtilDate.sumarMinutosHoraCita(horaCita,20).equals(valores[0]))) {                        
                         existeCita = true;
-
                     }
-
                 } else if (enRango && linea.matches("\\d{4}-\\d{2}-\\d{2}")) {
                     enRango = false;
                     break;
@@ -129,29 +120,5 @@ public class ControladorPaciente {
             }
         }
         return existeCita;
-    }
-
-    public String horaAntes(String horaCita) {
-        LocalTime hora = LocalTime.parse(horaCita, DateTimeFormatter.ofPattern("HH:mm"));
-        // Restar 20 minutos
-        LocalTime horaRestada = hora.minusMinutes(20);
-        // Formatear la hora restada como una cadena en el formato HH:mm
-        String horaRestadaStr = horaRestada.format(DateTimeFormatter.ofPattern("HH:mm"));
-
-        // System.out.println("Hora original: " + horaCita);
-        // System.out.println("Hora restada: " + horaRestadaStr);
-        return horaRestadaStr;
-    }
-
-    public String horaDespues(String horaCita) {
-        LocalTime hora = LocalTime.parse(horaCita, DateTimeFormatter.ofPattern("HH:mm"));
-        // Sumar 20 minutos
-        LocalTime horaSumada = hora.plusMinutes(20);
-        // Formatear la hora restada como una cadena en el formato HH:mm
-        String horaSumadaStr = horaSumada.format(DateTimeFormatter.ofPattern("HH:mm"));
-
-        // System.out.println("Hora original: " + horaCita);
-        // System.out.println("Hora restada: " + horaSumadaStr);
-        return horaSumadaStr;
     }
 }
