@@ -60,14 +60,14 @@ public class ControladorHorario {
                 validaHora = true;
             }
 
-        } else {
+        } else {// lunes a jueves
             validaDiaLunesAJueves = true;
             // Convertir la hora a un objeto de tipo LocalTime
             LocalTime horaIngresada = LocalTime.parse(hora);
 
             // Definir el rango de horas permitido
             LocalTime horaInicio = LocalTime.parse("07:59");
-            LocalTime horaFin = LocalTime.parse("19:01");
+            LocalTime horaFin = LocalTime.parse("18:41");
 
             // Verificar si la hora ingresada está dentro del rango
             if (horaIngresada.isAfter(horaInicio) && horaIngresada.isBefore(horaFin)) {
@@ -88,14 +88,14 @@ public class ControladorHorario {
         Integer respuesta = 0;
         SimpleDateFormat formato = new SimpleDateFormat("yyyy-MM-dd");
         Date fechaDate = formato.parse(fecha);
-        String fechaSistema = formato.format(new Date()); 
+        String fechaSistema = formato.format(new Date());
         Date fechaActual = formato.parse(fechaSistema);
-                    
+
         if (tipoCita.equals("ESPECIALISTA")) {
             if (fechaDate.compareTo(fechaActual) <= 0) {
                 respuesta = 1;
             }
-        } else {           
+        } else {
             if (fechaDate.compareTo(fechaActual) < 0) {
                 respuesta = 2;
             }
@@ -110,8 +110,8 @@ public class ControladorHorario {
         boolean valida = false;
 
         LocalTime hora = LocalTime.parse(horaIngresada);
-        LocalTime limiteInferior = LocalTime.parse("08:00");
-        LocalTime limiteSuperior = LocalTime.parse("18:40");
+        LocalTime limiteInferior = LocalTime.parse("07:59");
+        LocalTime limiteSuperior = LocalTime.parse("18:59");
 
         if (hora.isAfter(limiteInferior) && hora.isBefore(limiteSuperior) && hora.getMinute() % 20 == 0) {
             // System.out.println("La hora ingresada está dentro del rango de 20 minutos

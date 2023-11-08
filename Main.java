@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import Controladores.ControladorCitaMedica;
 import Controladores.ControladorHorario;
 import Controladores.ControladorPaciente;
 import Models.Paciente;
@@ -26,12 +27,16 @@ public class Main {
         String fechaNacimiento = "";
         String apoderado = "";
         String nombreApoderado = "";
+        String identificacionApoderado = "";
+        String tipoDocumentoApoderado = "";
+        String fechaNacimientoApoderado = "";
         int ultimoElemento = 0;
 
         List<String> registrosAntesDeNuevaCita = new ArrayList<>();
 
         ControladorHorario horario = new ControladorHorario();
         ControladorPaciente pacienteControlador = new ControladorPaciente();
+        ControladorCitaMedica citaControlador = new ControladorCitaMedica();
 
         try {
             br = new BufferedReader(new FileReader(nombreArchivo));
@@ -62,22 +67,10 @@ public class Main {
                     if (valores.length > 10) {
                         apoderado = valores[10].trim();
                         nombreApoderado = valores[11].trim();
+                        tipoDocumentoApoderado = valores[12].trim();
+                        identificacionApoderado = valores[13].trim();
+                        fechaNacimientoApoderado = valores[14].trim();
                     }
-
-                    /*
-                     * System.out.println("fecha: "+fechaCita);
-                     * System.out.println("hora: "+horaCita);
-                     * System.out.println("tipoCIta: "+tipoCita);
-                     * System.out.println("espcialidad: "+especialidad);
-                     * System.out.println("nombrePaciente: "+nombrePaciente);
-                     * System.out.println("tipoPaciente: "+tipoPaciente);
-                     * System.out.println("tipoDocumento: "+tipoDocumento);
-                     * System.out.println("identificacion: "+identificacion);
-                     * System.out.println("telefono: "+telefono);
-                     * System.out.println("fechaNacimiento: "+fechaNacimiento);
-                     * System.out.println("apoderado: "+apoderado);
-                     * System.out.println("nombreApoderado: "+nombreApoderado);
-                     */
                     break; // Detiene el bucle una vez que se encuentra el nuevo registro
                 }
             }
@@ -97,19 +90,19 @@ public class Main {
 
         if (!horario.horarioFuncionamiento(fechaCita)) {
             System.out.println("No se pudo agregar: **Esa fecha no hay atención solo horario laboral**");
-            listadoOriginal(registrosAntesDeNuevaCita);
+            mostrarListadoOriginal(registrosAntesDeNuevaCita);
             return;
         }
 
         if (!horario.validarHorario(fechaCita, horaCita)) {
             System.out.println("No se pudo agregar: **ese horario esta fuera del horario de atención**");
-            listadoOriginal(registrosAntesDeNuevaCita);
+            mostrarListadoOriginal(registrosAntesDeNuevaCita);
             return;
         }
 
         if (horario.validaFeriado(fechaCita)) {
             System.out.println("No se pudo agregar: **esa fecha es feriado**");
-            listadoOriginal(registrosAntesDeNuevaCita);
+            mostrarListadoOriginal(registrosAntesDeNuevaCita);
             return;
         }
 
@@ -119,12 +112,12 @@ public class Main {
             if (respuesta == 1) {
                 System.out.println(
                         "No se pudo agregar: **La cita para especialista debe ser con al menos 24h de anticipación**");
-                listadoOriginal(registrosAntesDeNuevaCita);
+                mostrarListadoOriginal(registrosAntesDeNuevaCita);
                 return;
             } else if (respuesta == 2) {
                 System.out.println(
                         "No se pudo agregar: **La cita para medicina general debe ser una fecha actual o superior**");
-                listadoOriginal(registrosAntesDeNuevaCita);
+                mostrarListadoOriginal(registrosAntesDeNuevaCita);
                 return;
             }
 
@@ -134,7 +127,7 @@ public class Main {
 
         if (!horario.horarioConsecutivo(horaCita)) {
             System.out.println("No se pudo agregar: **hora debe ser en intervalos de 20min.**");
-            listadoOriginal(registrosAntesDeNuevaCita);
+            mostrarListadoOriginal(registrosAntesDeNuevaCita);
             return;
         }
 
@@ -151,67 +144,41 @@ public class Main {
         String mensajeError = pacienteControlador.validaDatosPaciente(paciente);
         if (!mensajeError.isEmpty()) {
             System.out.println("No se pudo agregar: **" + mensajeError + "**");
-            listadoOriginal(registrosAntesDeNuevaCita);
+            mostrarListadoOriginal(registrosAntesDeNuevaCita);
             return;
         }
 
-        if(pacienteControlador.requiereApoderado(tipoPaciente, apoderado)){
+        if (pacienteControlador.requiereApoderado(tipoPaciente, apoderado)) {
             System.out.println("No se pudo agregar: **Se requiere un apoderado**");
-            listadoOriginal(registrosAntesDeNuevaCita);
+            mostrarListadoOriginal(registrosAntesDeNuevaCita);
             return;
         }
 
-        if(!pacienteControlador.isMayorEdadApoderado(fechaNacimiento)){
+        if (!pacienteControlador.isMayorEdadApoderado(fechaNacimientoApoderado)) {
             System.out.println("No se pudo agregar: **El apoderado debe ser mayor de edad**");
-            listadoOriginal(registrosAntesDeNuevaCita);
+            mostrarListadoOriginal(registrosAntesDeNuevaCita);
             return;
         }
 
-        pacienteControlador.existeCitaSimultanea(fechaCita, horaCita, identificacion);
+        if (pacienteControlador.existeCitaSimultanea(fechaCita, horaCita, identificacion)) {
+            System.out.println("No se pudo agregar: **No se puede tener citas simultaneas**");
+            mostrarListadoOriginal(registrosAntesDeNuevaCita);
+            return;
+        }
 
+        if (citaControlador.disponibleEspecialista(fechaCita, especialidad)) {
+            System.out.println("No se pudo agregar: **El especialista no esta disponible**");
+            mostrarListadoOriginal(registrosAntesDeNuevaCita);
+            return;
+        }
 
-        // Las consultas médicas tienen los siguientes horarios: Lunes a jueves 8:00
-        /*
-         * a
-         * // 19:00 Viernes 8:00 a 13:00
-         * if (existe) {
-         * boolean valida = horario.validarHorario(fechaCita, horaIngresada);
-         * System.out.println("valida " + valida);
-         * } else {
-         * System.out.println("dia fuera de funcionamiento");
-         * }
-         * // -------------------------------------
-         * boolean validaFeriado = horario.validaFeriado(fechaCita);
-         * if (validaFeriado) {
-         * System.out.println("fecha no disponible es feriado");
-         * }
-         * // -------------------------------------
-         * 
-         * try {
-         * horario.validaFechaFuturoEspecialista(fechaCita, tipoCitaIngresada);
-         * } catch (Exception e) {
-         * e.printStackTrace();
-         * }
-         * 
-         * // -------------------------------------
-         * boolean validaHoraConsecutiva = horario.horarioConsecutivo(horaIngresada);
-         * System.out.println("valida " + validaHoraConsecutiva);
-         * 
-         * ControladorPaciente paciente = new ControladorPaciente();
-         * boolean isMayor = paciente.mayorEdad();
-         * if (isMayor) {
-         * System.out.println("Es mayor de edad");
-         * } else {
-         * System.out.println("Es menor de edad");
-         * }
-         * 
-         * paciente.validaDatosPaciente(tipoIndentificacion, identificacionIngresada,
-         * nombreIngresado, fechaNacimiento,
-         * telefono);
-         */
+        citaControlador.disponibleGeneral(fechaCita);
+
+        // cita fue exitosa
+
     }
 
-    public static void listadoOriginal(List<String> registrosAntesDeNuevaCita) {
+    public static void mostrarListadoOriginal(List<String> registrosAntesDeNuevaCita) {
         for (String item : registrosAntesDeNuevaCita) {
             System.out.println(item);
         }

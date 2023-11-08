@@ -1,5 +1,9 @@
 package Controladores;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+
 public class ControladorCitaMedica {
 
     /**
@@ -14,7 +18,84 @@ public class ControladorCitaMedica {
      * Ningún profesional puede tener citas simultáneas
      */
 
-    public void validaDisponibilidad(Object datosCita) {
+    // 2 generales
+    // 3 especialistas
+    public boolean disponibleEspecialista(String fechaCita, String especialidad) {
+        String nombreArchivo = "inputs/med_input.txt";
+        boolean noDisponible = false;
+        BufferedReader br = null;
+        try {
+            br = new BufferedReader(new FileReader(nombreArchivo));
+            String linea;
+            boolean enRango = false;
 
+            while ((linea = br.readLine()) != null) {
+                if (linea.contains(fechaCita)) {
+                    enRango = true;
+                } else if (enRango && linea.matches("\\d{2}:\\d{2}\\|.*")) {
+                    String[] valores = linea.split("\\|");
+
+                    if (especialidad.equals(valores[2])) {
+                        noDisponible = true;
+                        // System.out.println("El especialista no esta disponible");
+                    }
+                } else if (enRango && linea.matches("\\d{4}-\\d{2}-\\d{2}")) {
+                    enRango = false;
+                    break;
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (br != null) {
+                    br.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return noDisponible;
+    }
+
+    public boolean disponibleGeneral(String fechaCita) {
+        String nombreArchivo = "inputs/med_input.txt";
+        boolean noDisponible = false;
+        BufferedReader br = null;
+        Integer contador = 0;
+        try {
+            br = new BufferedReader(new FileReader(nombreArchivo));
+            String linea;
+            boolean enRango = false;
+
+            while ((linea = br.readLine()) != null) {
+                if (linea.contains(fechaCita)) {
+                    enRango = true;
+                } else if (enRango && linea.matches("\\d{2}:\\d{2}\\|.*")) {
+                    String[] valores = linea.split("\\|");
+
+                    if ("GENERAL".equals(valores[1].trim())) {
+                        System.out.println("ingreso");
+                        contador++;
+                        // System.out.println("El especialista no esta disponible");
+                    }
+                } else if (enRango && linea.matches("\\d{4}-\\d{2}-\\d{2}")) {
+                    enRango = false;
+                    break;
+                }
+            }
+            System.out.println("contador: " + contador);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (br != null) {
+                    br.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return noDisponible;
     }
 }
