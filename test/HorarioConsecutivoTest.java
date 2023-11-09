@@ -1,4 +1,5 @@
 package test;
+
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import org.junit.Test;
@@ -7,7 +8,7 @@ import Controladores.ControladorHorario;
 public class HorarioConsecutivoTest {
     @Test
     public void testHorarioConsecutivo_horaValida() {
-            ControladorHorario horario = new ControladorHorario(); 
+        ControladorHorario horario = new ControladorHorario();
         assertTrue(horario.horarioConsecutivo("08:00")); // Debería ser true
     }
 
@@ -25,7 +26,7 @@ public class HorarioConsecutivoTest {
 
     @Test
     public void testHorarioConsecutivo_HoraLimiteSuperior() {
-        ControladorHorario horario = new ControladorHorario(); 
+        ControladorHorario horario = new ControladorHorario();
         assertFalse(horario.horarioConsecutivo("19:00")); // Debería ser false
     }
 
