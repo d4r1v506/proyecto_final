@@ -8,11 +8,11 @@ import Controladores.ControladorCitaMedica;
 import Controladores.ControladorHorario;
 import Controladores.ControladorPaciente;
 import Models.Paciente;
+import util.Constantes;
 
 public class Main {
     public static void main(String[] args) {
 
-        String nombreArchivo = "inputs/med_input.txt";
         BufferedReader br = null;
         boolean encontradaNuevaCita = false;
         String fechaCita = "";
@@ -31,15 +31,14 @@ public class Main {
         String tipoDocumentoApoderado = "";
         String fechaNacimientoApoderado = "";
         int ultimoElemento = 0;
-
+        String citaExitosa = "";
         List<String> registrosAntesDeNuevaCita = new ArrayList<>();
-
         ControladorHorario horario = new ControladorHorario();
         ControladorPaciente pacienteControlador = new ControladorPaciente();
         ControladorCitaMedica citaControlador = new ControladorCitaMedica();
 
         try {
-            br = new BufferedReader(new FileReader(nombreArchivo));
+            br = new BufferedReader(new FileReader(Constantes.NOMBRE_ARCHIVO_INPUT));
             String linea;
 
             while ((linea = br.readLine()) != null) {
@@ -47,11 +46,10 @@ public class Main {
                     encontradaNuevaCita = true;
                     continue;
                 }
-
+                citaExitosa = linea;
                 registrosAntesDeNuevaCita.add(linea);
                 ultimoElemento = registrosAntesDeNuevaCita.size() - 1;
                 // System.out.println(linea);
-
                 if (encontradaNuevaCita) {
                     String[] valores = linea.split("\\|");
                     fechaCita = valores[0].trim();
@@ -131,9 +129,6 @@ public class Main {
             return;
         }
 
-        // String tipoIdentificacion, String identificacion, String nombre,
-        // String fechaNacimiento, String telefono
-
         Paciente paciente = new Paciente();
         paciente.setTipoIdentificaion(tipoDocumento);
         paciente.setIdentificacion(identificacion);
@@ -166,16 +161,21 @@ public class Main {
             return;
         }
 
-        if (citaControlador.disponibleEspecialista(fechaCita, especialidad)) {
+        if (citaControlador.disponibleEspecialista(fechaCita, especialidad, horaCita)) {
             System.out.println("No se pudo agregar: **El especialista no esta disponible**");
             mostrarListadoOriginal(registrosAntesDeNuevaCita);
             return;
         }
 
-        citaControlador.disponibleGeneral(fechaCita);
+        if (citaControlador.disponibleGeneral(fechaCita, horaCita)) {
+            System.out.println("No se pudo agregar: **los 2 prfesionales en medicina general esta ocupados**");
+            mostrarListadoOriginal(registrosAntesDeNuevaCita);
+            return;
+        }
 
         // cita fue exitosa
-
+        System.out.println("Cita creada Existosamente!!: \n" + citaExitosa);
+        mostrarListadoOriginal(registrosAntesDeNuevaCita);
     }
 
     public static void mostrarListadoOriginal(List<String> registrosAntesDeNuevaCita) {
@@ -183,4 +183,5 @@ public class Main {
             System.out.println(item);
         }
     }
+
 }

@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 
+import util.Constantes;
+
 public class ControladorCitaMedica {
 
     /**
@@ -20,12 +22,11 @@ public class ControladorCitaMedica {
 
     // 2 generales
     // 3 especialistas
-    public boolean disponibleEspecialista(String fechaCita, String especialidad) {
-        String nombreArchivo = "inputs/med_input.txt";
+    public boolean disponibleEspecialista(String fechaCita, String especialidad, String horaCita) {
         boolean noDisponible = false;
         BufferedReader br = null;
         try {
-            br = new BufferedReader(new FileReader(nombreArchivo));
+            br = new BufferedReader(new FileReader(Constantes.NOMBRE_ARCHIVO_INPUT));
             String linea;
             boolean enRango = false;
 
@@ -35,9 +36,8 @@ public class ControladorCitaMedica {
                 } else if (enRango && linea.matches("\\d{2}:\\d{2}\\|.*")) {
                     String[] valores = linea.split("\\|");
 
-                    if (especialidad.equals(valores[2])) {
+                    if (especialidad.equals(valores[2]) && horaCita.equals(valores[0])) {
                         noDisponible = true;
-                        // System.out.println("El especialista no esta disponible");
                     }
                 } else if (enRango && linea.matches("\\d{4}-\\d{2}-\\d{2}")) {
                     enRango = false;
@@ -58,13 +58,12 @@ public class ControladorCitaMedica {
         return noDisponible;
     }
 
-    public boolean disponibleGeneral(String fechaCita) {
-        String nombreArchivo = "inputs/med_input.txt";
+    public boolean disponibleGeneral(String fechaCita, String horaCita) {
         boolean noDisponible = false;
         BufferedReader br = null;
         Integer contador = 0;
         try {
-            br = new BufferedReader(new FileReader(nombreArchivo));
+            br = new BufferedReader(new FileReader(Constantes.NOMBRE_ARCHIVO_INPUT));
             String linea;
             boolean enRango = false;
 
@@ -74,17 +73,17 @@ public class ControladorCitaMedica {
                 } else if (enRango && linea.matches("\\d{2}:\\d{2}\\|.*")) {
                     String[] valores = linea.split("\\|");
 
-                    if ("GENERAL".equals(valores[1].trim())) {
-                        System.out.println("ingreso");
+                    if ("GENERAL".equals(valores[1].trim()) && horaCita.equals(valores[0])) {
                         contador++;
-                        // System.out.println("El especialista no esta disponible");
                     }
                 } else if (enRango && linea.matches("\\d{4}-\\d{2}-\\d{2}")) {
                     enRango = false;
                     break;
                 }
             }
-            System.out.println("contador: " + contador);
+            if (contador >= 2) {
+                noDisponible = true;
+            }
         } catch (IOException e) {
             e.printStackTrace();
         } finally {

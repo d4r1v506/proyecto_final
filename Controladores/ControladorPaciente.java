@@ -30,7 +30,8 @@ public class ControladorPaciente {
 
     public String validaDatosPaciente(Paciente paciente) {
         String mensajeError = "";
-        if (!(paciente.getTipoIdentificaion().equals(Constantes.TIPO_CEDULA) || paciente.getTipoIdentificaion().equals(Constantes.TIPO_PASAPORTE))) {
+        if (!(paciente.getTipoIdentificaion().equals(Constantes.TIPO_CEDULA)
+                || paciente.getTipoIdentificaion().equals(Constantes.TIPO_PASAPORTE))) {
             mensajeError = "El tipo identificacion solo puede ser C o P";
         }
 
@@ -58,7 +59,7 @@ public class ControladorPaciente {
         if (paciente.getNombre().isEmpty()) {
             mensajeError = "El nombre del paciente es campo obligatorio";
         }
-        
+
         Pattern pattern = Pattern.compile(Constantes.FORMATO_FECHA);
         Matcher igualFormato = pattern.matcher(paciente.getFechaNacimiento());
         if (!igualFormato.matches()) {
@@ -82,10 +83,11 @@ public class ControladorPaciente {
 
     public boolean isMayorEdadApoderado(String fechaNacimiento) {
         LocalDate fechaLocalDate = UtilDate.convierteFechaStringtoLocalDate(fechaNacimiento);
-        return ChronoUnit.YEARS.between(fechaLocalDate, UtilDate.obtieneFechaActualLocalDate()) >= Constantes.EDAD_ADULTO;
+        return ChronoUnit.YEARS.between(fechaLocalDate,
+                UtilDate.obtieneFechaActualLocalDate()) >= Constantes.EDAD_ADULTO;
     }
 
-    public boolean existeCitaSimultanea(String fechaCita, String horaCita, String identificacion) {        
+    public boolean existeCitaSimultanea(String fechaCita, String horaCita, String identificacion) {
         boolean existeCita = false;
         BufferedReader br = null;
         try {
@@ -96,11 +98,12 @@ public class ControladorPaciente {
             while ((linea = br.readLine()) != null) {
                 if (linea.contains(fechaCita)) {
                     enRango = true;
-                } else if (enRango && linea.matches("\\d{2}:\\d{2}\\|.*")) {                    
+                } else if (enRango && linea.matches("\\d{2}:\\d{2}\\|.*")) {
                     String[] valores = linea.split("\\|");
 
                     if (identificacion.equals(valores[6])
-                            && (UtilDate.restarMinutosHoraCita(horaCita,20).equals(valores[0]) || UtilDate.sumarMinutosHoraCita(horaCita,20).equals(valores[0]))) {                        
+                            && (UtilDate.restarMinutosHoraCita(horaCita, 20).equals(valores[0])
+                                    || UtilDate.sumarMinutosHoraCita(horaCita, 20).equals(valores[0]))) {
                         existeCita = true;
                     }
                 } else if (enRango && linea.matches("\\d{4}-\\d{2}-\\d{2}")) {
