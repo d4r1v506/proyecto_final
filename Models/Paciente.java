@@ -6,18 +6,19 @@ package Models;
  */
 public class Paciente {
     private String identificacion;
-    private String tipoIdentificaion;
+    private String tipoIdentificacion;
     private String nombre;
     private String fechaNacimiento;
     private String telefono;
 
-    public Paciente(String identificacion, String tipoIdentificaion, String nombre, String apellido,
-            String fechaNacimiento) {
-        this.identificacion = identificacion;
-        this.tipoIdentificaion = tipoIdentificaion;
-        this.nombre = nombre;
-        this.fechaNacimiento = fechaNacimiento;
-    }
+    // public Paciente(String identificacion, String tipoIdentificaion, String
+    // nombre, String apellido,
+    // String fechaNacimiento) {
+    // this.identificacion = identificacion;
+    // this.tipoIdentificaion = tipoIdentificaion;
+    // this.nombre = nombre;
+    // this.fechaNacimiento = fechaNacimiento;
+    // }
 
     public Paciente() {
 
@@ -27,40 +28,54 @@ public class Paciente {
         return identificacion;
     }
 
-    public String getTipoIdentificaion() {
-        return tipoIdentificaion;
+    public String getTipoIdentificacion() {
+        return tipoIdentificacion;
     }
 
     public String getNombre() {
         return nombre;
     }
 
-    public void setIdentificacion(String identificacion) {
-        this.identificacion = identificacion;
-    }
-
-    public void setTipoIdentificaion(String tipoIdentificaion) {
-        this.tipoIdentificaion = tipoIdentificaion;
-    }
-
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
-
     public String getFechaNacimiento() {
         return fechaNacimiento;
-    }
-
-    public void setFechaNacimiento(String fechaNacimiento) {
-        this.fechaNacimiento = fechaNacimiento;
     }
 
     public String getTelefono() {
         return telefono;
     }
 
-    public void setTelefono(String telefono) {
-        this.telefono = telefono;
+    public static class PacienteBuilder {
+        private Paciente paciente = new Paciente();
+
+        public PacienteBuilder identificacion(String identificacion) {
+            paciente.identificacion = identificacion;
+            return this;
+        }
+
+        public PacienteBuilder tipoIdentificacion(String tipoIdentificacion) {
+            paciente.tipoIdentificacion = tipoIdentificacion;
+            return this;
+        }
+
+        public PacienteBuilder nombre(String nombre) {
+            paciente.nombre = nombre;
+            return this;
+        }
+
+        public PacienteBuilder fechaNacimiento(String fechaNacimiento) {
+            paciente.fechaNacimiento = fechaNacimiento;
+            return this;
+        }
+
+        public PacienteBuilder telefono(String telefono) {
+            paciente.telefono = telefono;
+            return this;
+        }
+
+        public Paciente build() {
+            return paciente;
+        }
+
     }
 
 }

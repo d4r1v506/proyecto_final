@@ -4,8 +4,6 @@
  */
 package Models;
 
-import java.util.logging.Logger;
-
 /**
  *
  * @author Admin
@@ -24,7 +22,8 @@ public class AdultoApoderado {
     public void setIsAdultoPoderado(boolean IsAdultoPoderado) {
         this.IsAdultoPoderado = IsAdultoPoderado;
     }
-   public boolean getIsAdultoPoderado() {
+
+    public boolean getIsAdultoPoderado() {
         return IsAdultoPoderado;
     }
 }

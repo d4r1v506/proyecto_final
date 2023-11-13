@@ -4,8 +4,6 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -30,12 +28,12 @@ public class ControladorPaciente {
 
     public String validaDatosPaciente(Paciente paciente) {
         String mensajeError = "";
-        if (!(paciente.getTipoIdentificaion().equals(Constantes.TIPO_CEDULA)
-                || paciente.getTipoIdentificaion().equals(Constantes.TIPO_PASAPORTE))) {
+        if (!(paciente.getTipoIdentificacion().equals(Constantes.TIPO_CEDULA)
+                || paciente.getTipoIdentificacion().equals(Constantes.TIPO_PASAPORTE))) {
             mensajeError = "El tipo identificacion solo puede ser C o P";
         }
 
-        switch (paciente.getTipoIdentificaion()) {
+        switch (paciente.getTipoIdentificacion()) {
             case Constantes.TIPO_CEDULA:
                 if (paciente.getIdentificacion().length() != 10) {
                     mensajeError = "La cédula debe tener 10 dígitos";
@@ -81,7 +79,7 @@ public class ControladorPaciente {
         return tipoPaciente.equals(Constantes.PACIENTE_MENOR) && apoderado.isEmpty();
     }
 
-    public boolean isMayorEdadApoderado(String fechaNacimiento) {
+    public boolean esMayorEdadApoderado(String fechaNacimiento) {
         LocalDate fechaLocalDate = UtilDate.convierteFechaStringtoLocalDate(fechaNacimiento);
         return ChronoUnit.YEARS.between(fechaLocalDate,
                 UtilDate.obtieneFechaActualLocalDate()) >= Constantes.EDAD_ADULTO;

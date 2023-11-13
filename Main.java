@@ -1,121 +1,52 @@
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import Controladores.ControladorCitaMedica;
 import Controladores.ControladorHorario;
 import Controladores.ControladorPaciente;
 import Models.Paciente;
-import util.Constantes;
+import util.LecturaArchivo;
 
-public class Main {
+public class Main implements LecturaArchivo {
     public static void main(String[] args) {
-
-        BufferedReader br = null;
-        boolean encontradaNuevaCita = false;
-        String fechaCita = "";
-        String horaCita = "";
-        String tipoCita = "";
-        String especialidad = "";
-        String nombrePaciente = "";
-        String tipoPaciente = "";
-        String tipoDocumento = "";
-        String identificacion = "";
-        String telefono = "";
-        String fechaNacimiento = "";
-        String apoderado = "";
-        String nombreApoderado = "";
-        String identificacionApoderado = "";
-        String tipoDocumentoApoderado = "";
-        String fechaNacimientoApoderado = "";
-        int ultimoElemento = 0;
-        String citaExitosa = "";
-        List<String> registrosAntesDeNuevaCita = new ArrayList<>();
         ControladorHorario horario = new ControladorHorario();
         ControladorPaciente pacienteControlador = new ControladorPaciente();
         ControladorCitaMedica citaControlador = new ControladorCitaMedica();
 
-        try {
-            br = new BufferedReader(new FileReader(Constantes.NOMBRE_ARCHIVO_INPUT));
-            String linea;
+        Map<String, String> map = new HashMap<>();
+        map = LecturaArchivo.cargarDatosNuevaCita();
 
-            while ((linea = br.readLine()) != null) {
-                if (linea.contains("NUEVA CITA")) {
-                    encontradaNuevaCita = true;
-                    continue;
-                }
-                citaExitosa = linea;
-                registrosAntesDeNuevaCita.add(linea);
-                ultimoElemento = registrosAntesDeNuevaCita.size() - 1;
-                // System.out.println(linea);
-                if (encontradaNuevaCita) {
-                    String[] valores = linea.split("\\|");
-                    fechaCita = valores[0].trim();
-                    horaCita = valores[1].trim();
-                    tipoCita = valores[2].trim();
-                    especialidad = valores[3].trim();
-                    nombrePaciente = valores[4].trim();
-                    tipoPaciente = valores[5].trim();
-                    tipoDocumento = valores[6].trim();
-                    identificacion = valores[7].trim();
-                    telefono = valores[8].trim();
-                    fechaNacimiento = valores[9].trim();
-                    if (valores.length > 10) {
-                        apoderado = valores[10].trim();
-                        nombreApoderado = valores[11].trim();
-                        tipoDocumentoApoderado = valores[12].trim();
-                        identificacionApoderado = valores[13].trim();
-                        fechaNacimientoApoderado = valores[14].trim();
-                    }
-                    break; // Detiene el bucle una vez que se encuentra el nuevo registro
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (br != null) {
-                    br.close();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        registrosAntesDeNuevaCita.remove(ultimoElemento);
-
-        if (!horario.horarioFuncionamiento(fechaCita)) {
+        if (!horario.horarioFuncionamiento(map.get("fechaCita"))) {
             System.out.println("No se pudo agregar: **Esa fecha no hay atención solo horario laboral**");
-            mostrarListadoOriginal(registrosAntesDeNuevaCita);
+            mostrarListadoOriginal(LecturaArchivo.retornaListaOriginal());
             return;
         }
 
-        if (!horario.validarHorario(fechaCita, horaCita)) {
+        if (!horario.validarHorario(map.get("fechaCita"), map.get("horaCita"))) {
             System.out.println("No se pudo agregar: **ese horario esta fuera del horario de atención**");
-            mostrarListadoOriginal(registrosAntesDeNuevaCita);
+            mostrarListadoOriginal(LecturaArchivo.retornaListaOriginal());
             return;
         }
 
-        if (horario.validaFeriado(fechaCita)) {
+        if (horario.esDiaFeriado(map.get("fechaCita"))) {
             System.out.println("No se pudo agregar: **esa fecha es feriado**");
-            mostrarListadoOriginal(registrosAntesDeNuevaCita);
+            mostrarListadoOriginal(LecturaArchivo.retornaListaOriginal());
             return;
         }
 
         try {
-            Integer respuesta = horario.validaFechaFuturoEspecialista(fechaCita, tipoCita);
+            Integer respuesta = horario.validaFechaFuturoEspecialista(map.get("fechaCita"), map.get("tipoCita"));
 
             if (respuesta == 1) {
                 System.out.println(
                         "No se pudo agregar: **La cita para especialista debe ser con al menos 24h de anticipación**");
-                mostrarListadoOriginal(registrosAntesDeNuevaCita);
+                mostrarListadoOriginal(LecturaArchivo.retornaListaOriginal());
                 return;
             } else if (respuesta == 2) {
                 System.out.println(
                         "No se pudo agregar: **La cita para medicina general debe ser una fecha actual o superior**");
-                mostrarListadoOriginal(registrosAntesDeNuevaCita);
+                mostrarListadoOriginal(LecturaArchivo.retornaListaOriginal());
                 return;
             }
 
@@ -123,62 +54,66 @@ public class Main {
             e.printStackTrace();
         }
 
-        if (!horario.horarioConsecutivo(horaCita)) {
+        if (!horario.horarioConsecutivo(map.get("horaCita"))) {
             System.out.println("No se pudo agregar: **hora debe ser en intervalos de 20min.**");
-            mostrarListadoOriginal(registrosAntesDeNuevaCita);
+            mostrarListadoOriginal(LecturaArchivo.retornaListaOriginal());
             return;
         }
 
-        Paciente paciente = new Paciente();
-        paciente.setTipoIdentificaion(tipoDocumento);
-        paciente.setIdentificacion(identificacion);
-        paciente.setNombre(nombrePaciente);
-        paciente.setFechaNacimiento(fechaNacimiento);
-        paciente.setTelefono(telefono);
+        Paciente paciente = new Paciente.PacienteBuilder()
+                .tipoIdentificacion(map.get("tipoDocumento"))
+                .identificacion(map.get("identificacion"))
+                .nombre(map.get("nombrePaciente"))
+                .fechaNacimiento(map.get("fechaNacimiento"))
+                .telefono(map.get("telefono"))
+                .build();
 
         String mensajeError = pacienteControlador.validaDatosPaciente(paciente);
         if (!mensajeError.isEmpty()) {
             System.out.println("No se pudo agregar: **" + mensajeError + "**");
-            mostrarListadoOriginal(registrosAntesDeNuevaCita);
+            mostrarListadoOriginal(LecturaArchivo.retornaListaOriginal());
             return;
         }
 
-        if (pacienteControlador.requiereApoderado(tipoPaciente, apoderado)) {
+        if (pacienteControlador.requiereApoderado(map.get("tipoPaciente"), map.get("apoderado"))) {
             System.out.println("No se pudo agregar: **Se requiere un apoderado**");
-            mostrarListadoOriginal(registrosAntesDeNuevaCita);
+            mostrarListadoOriginal(LecturaArchivo.retornaListaOriginal());
             return;
         }
 
-        if (!pacienteControlador.isMayorEdadApoderado(fechaNacimientoApoderado)) {
+        if (!pacienteControlador.esMayorEdadApoderado(map.get("fechaNacimientoApoderado"))) {
             System.out.println("No se pudo agregar: **El apoderado debe ser mayor de edad**");
-            mostrarListadoOriginal(registrosAntesDeNuevaCita);
+            mostrarListadoOriginal(LecturaArchivo.retornaListaOriginal());
             return;
         }
 
-        if (pacienteControlador.existeCitaSimultanea(fechaCita, horaCita, identificacion)) {
+        if (pacienteControlador.existeCitaSimultanea(map.get("fechaCita"), map.get("horaCita"),
+                map.get("identificacion"))) {
             System.out.println("No se pudo agregar: **No se puede tener citas simultaneas**");
-            mostrarListadoOriginal(registrosAntesDeNuevaCita);
+            mostrarListadoOriginal(LecturaArchivo.retornaListaOriginal());
             return;
         }
 
-        if (citaControlador.disponibleEspecialista(fechaCita, especialidad, horaCita)) {
+        if (citaControlador.disponibleEspecialista(map.get("fechaCita"), map.get("especialidad"),
+                map.get("horaCita"))) {
             System.out.println("No se pudo agregar: **El especialista no esta disponible**");
-            mostrarListadoOriginal(registrosAntesDeNuevaCita);
+            mostrarListadoOriginal(LecturaArchivo.retornaListaOriginal());
             return;
         }
 
-        if (citaControlador.disponibleGeneral(fechaCita, horaCita)) {
+        if (citaControlador.disponibleGeneral(map.get("fechaCita"), map.get("horaCita"))) {
             System.out.println("No se pudo agregar: **los 2 prfesionales en medicina general esta ocupados**");
-            mostrarListadoOriginal(registrosAntesDeNuevaCita);
+            mostrarListadoOriginal(LecturaArchivo.retornaListaOriginal());
             return;
         }
 
         // cita fue exitosa
-        System.out.println("Cita creada Existosamente!!: \n" + citaExitosa);
-        mostrarListadoOriginal(registrosAntesDeNuevaCita);
+        System.out.println("Cita creada Existosamente!!: \n" + map.get("citaExitosa"));
+        mostrarListadoOriginal(LecturaArchivo.retornaListaOriginal());
     }
 
     public static void mostrarListadoOriginal(List<String> registrosAntesDeNuevaCita) {
+        System.out.println("-----Lista Original------");
         for (String item : registrosAntesDeNuevaCita) {
             System.out.println(item);
         }

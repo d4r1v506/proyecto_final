@@ -7,17 +7,16 @@ import org.junit.Test;
 
 import Controladores.ControladorHorario;
 
-
 public class HorarioFeriadoTest {
     @Test
     public void testHorarioFeriadoEsValido() {
         ControladorHorario horario = new ControladorHorario();
-        assertTrue(horario.validaFeriado("2023-08-10"));
+        assertTrue(horario.esDiaFeriado("2023-08-10"));
     }
 
     @Test
     public void testHorarioFeriadoNoEsValido() {
         ControladorHorario horario = new ControladorHorario();
-         assertFalse(horario.validaFeriado("2023-08-11"));
+        assertFalse(horario.esDiaFeriado("2023-08-11"));
     }
 }

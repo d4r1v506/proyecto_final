@@ -9,7 +9,7 @@ public class ControladorHorario {
 
     // El establecimiento opera de lunes a viernes
     public boolean horarioFuncionamiento(String fecha) {
-        String  diaSemana = UtilDate.obtenerDiaSemana(fecha);
+        String diaSemana = UtilDate.obtenerDiaSemana(fecha);
         return Constantes.LISTA_DIAS_LABORABLES.contains(diaSemana.toUpperCase());
     }
 
@@ -19,7 +19,7 @@ public class ControladorHorario {
         String diaSemana = UtilDate.obtenerDiaSemana(fecha);
         boolean validaHora = false;
         if (diaSemana.toUpperCase().equals("VIERNES")) {
-           LocalTime horaIngresada = UtilDate.convierteHoraStringtoLocalTime(hora);
+            LocalTime horaIngresada = UtilDate.convierteHoraStringtoLocalTime(hora);
             // Definir el rango de horas permitido
             LocalTime horaInicio = LocalTime.parse("07:59");
             LocalTime horaFin = LocalTime.parse("13:01");
@@ -42,23 +42,23 @@ public class ControladorHorario {
     }
 
     // Los días feriados no hay atención de ningún servicio.
-    public boolean validaFeriado(String fecha) {
-        return Constantes.LISTA_DIAS_FERIADO.contains(fecha);
+    public boolean esDiaFeriado(String fechaCita) {
+        return Constantes.LISTA_DIAS_FERIADO.contains(fechaCita);
     }
 
     // Solo se pueden registrar citas en el futuro. solo para especialistas
     public Integer validaFechaFuturoEspecialista(String fecha, String tipoCita) throws Exception {
         Integer respuesta = 0;
-        Date fechaCita = UtilDate.obtieneFechaStringtoDate(fecha);        
+        Date fechaCita = UtilDate.obtieneFechaStringtoDate(fecha);
         Date fechaActual = UtilDate.obtieneFechaActualDate();
 
         if (tipoCita.equals("ESPECIALISTA")) {
-            //fechaCita es anterior o igual a fechaActual
+            // fechaCita es anterior o igual a fechaActual
             if (fechaCita.compareTo(fechaActual) <= 0) {
                 respuesta = 1;
             }
         } else {
-            //fechaCita es posterior a fechaActual
+            // fechaCita es posterior a fechaActual
             if (fechaCita.compareTo(fechaActual) < 0) {
                 respuesta = 2;
             }

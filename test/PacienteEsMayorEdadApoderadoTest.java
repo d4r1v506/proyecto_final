@@ -7,17 +7,17 @@ import org.junit.Test;
 
 import Controladores.ControladorPaciente;
 
-public class PacienteIsMayorEdadApoderadoTest {
+public class PacienteEsMayorEdadApoderadoTest {
 
     @Test
     public void testPacienteEsMayorEdadApoderado() {
         ControladorPaciente paciente = new ControladorPaciente();
-        assertTrue(paciente.isMayorEdadApoderado("1986-01-01"));
+        assertTrue(paciente.esMayorEdadApoderado("1986-01-01"));
     }
 
     @Test
     public void testPacienteNoEsMayorEdadApoderado() {
         ControladorPaciente paciente = new ControladorPaciente();
-        assertFalse(paciente.isMayorEdadApoderado("2015-01-01"));
+        assertFalse(paciente.esMayorEdadApoderado("2015-01-01"));
     }
 }
